@@ -52,16 +52,19 @@ def allowed_file(filename):
 
 def style_transfer(content_image, style_image, encoder, decoder, alpha, device):
     content_transform = transforms.Compose([
-        transforms.Resize(1024),
+        transforms.Resize(64),
         transforms.ToTensor()
     ])
 
     style_transform = transforms.Compose([
-        transforms.Resize(1024),
+        transforms.Resize(64),
         transforms.ToTensor()
     ])
     content_image = content_transform(content_image).unsqueeze(0).to(device)
     style_image = style_transform(style_image).unsqueeze(0).to(device)
+
+    print(content_image.size)
+    print(style_image.size)
 
     with torch.inference_mode():
         content_feats = encoder(content_image, is_test=True)
@@ -72,6 +75,7 @@ def style_transfer(content_image, style_image, encoder, decoder, alpha, device):
         stylized_feats = alpha * stylized_feats + (1 - alpha) * content_feats
 
         stylized_image = decoder(stylized_feats)
+        print("Inference finished")
 
     return stylized_image
 
